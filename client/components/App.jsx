@@ -3,8 +3,12 @@ App = React.createClass({
 
   getMeteorData() {
     return {
-      phrases: Phrases.find({}).fetch()
+      phrases: Phrases.find({}, {sort: {createdAt: -1}}).fetch()
     }
+  },
+
+  componentDidMount() {
+    this.refs.textInput.focus();
   },
 
   handleInput(event) {
@@ -36,14 +40,12 @@ App = React.createClass({
           </div>
         </div>
         <div className="ui container">
-          <div className="ui form">
-            <div className="field">
-              <input
-                type="text"
-                ref="textInput"
-                placeholder="Type a new phrase"
-                onKeyUp={this.handleInput} />
-            </div>
+          <div className="ui fluid input">
+            <input
+              type="text"
+              ref="textInput"
+              placeholder="Type a new phrase"
+              onKeyUp={this.handleInput} />
           </div>
           <table className="ui table">
             <thead>
