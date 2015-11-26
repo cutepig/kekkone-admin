@@ -17,13 +17,13 @@ Phrase = React.createClass({
   },
 
   savePhrase() {
-    Phrases.update(this.props.phrase._id, {
+    PhrasesCollection.update(this.props.phrase._id, {
       $set: { text: this.refs.textInput.value.trim() }
     });
   },
 
   deletePhrase() {
-    Phrases.remove(this.props.phrase._id);
+    PhrasesCollection.remove(this.props.phrase._id);
   },
 
   handleClickEdit(event) {
