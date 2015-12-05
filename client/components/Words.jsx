@@ -111,13 +111,16 @@ Words = React.createClass({
   mixins: [ReactMeteorData],
 
   getMeteorData() {
-    return {
-      category: CategoriesCollection.findOne(this.props.params.categoryId),
-      words: WordsCollection.find(
-          { categoryId: this.props.params.categoryId },
-          { sort: {createdAt: -1} }
-        ).fetch()
-    }
+    data = {};
+    categoryId = this.props.params.categoryId;
+
+    Meteor.subscribe('category', categoryId);
+    data.category = CategoriesCollection.findOne({ _id: categoryId });
+
+    Meteor.subscribe('words', categoryId);
+    data.words = WordsCollection.find({}, { sort: {createdAt: -1} }).fetch();
+
+    return data;
   },
 
   componentDidMount() {
@@ -140,7 +143,10 @@ Words = React.createClass({
   },
 
   render() {
-    let placeholder = `Type a new word for the category "${this.data.category.text}"`;
+    placeholder = 'Type a new word for the category';
+    if (this.data.category) {
+      placeholder += ` "${this.data.category.text}"`;
+    }
 
     return (
       <div>

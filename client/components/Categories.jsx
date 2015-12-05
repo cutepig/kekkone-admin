@@ -8,8 +8,10 @@ Category = React.createClass({
   },
 
   getMeteorData() {
+    categoryId = this.props.category._id;
+    Meteor.subscribe('words', categoryId);
     return {
-      count: WordsCollection.find({categoryId: this.props.category._id}).count()
+      count: WordsCollection.find({categoryId: categoryId}).count()
     }
   },
 
@@ -133,6 +135,7 @@ Categories = React.createClass({
   mixins: [ReactMeteorData],
 
   getMeteorData() {
+    Meteor.subscribe('categories');
     return {
       categories: CategoriesCollection.find({}, {sort: {createdAt: -1}}).fetch()
     }

@@ -111,6 +111,7 @@ Phrases = React.createClass({
   mixins: [ReactMeteorData],
 
   getMeteorData() {
+    Meteor.subscribe('phrases');
     return {
       phrases: PhrasesCollection.find({}, {sort: {createdAt: -1}}).fetch()
     }
