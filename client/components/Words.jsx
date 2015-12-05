@@ -114,11 +114,12 @@ Words = React.createClass({
     data = {};
     categoryId = this.props.params.categoryId;
 
-    this.categorySubscription = Meteor.subscribe('category', categoryId);
-    data.category = CategoriesCollection.findOne({ _id: categoryId });
-
-    this.wordsSubscription = Meteor.subscribe('words', categoryId);
-    data.words = WordsCollection.find({}, { sort: {createdAt: -1} }).fetch();
+    if (Meteor.subscribe('category', categoryId).ready()) {
+      data.category = CategoriesCollection.findOne({ _id: categoryId });
+    }
+    if (Meteor.subscribe('words', categoryId).ready()) {
+      data.words = WordsCollection.find({}, { sort: {createdAt: -1} }).fetch();
+    }
 
     return data;
   },
@@ -134,8 +135,7 @@ Words = React.createClass({
   },
 
   render() {
-    if (!this.categorySubscription.ready() ||
-        !this.wordsSubscription.ready()) {
+    if (!this.data.category || !this.data.words) {
       return <Loader/>;
     }
     return (

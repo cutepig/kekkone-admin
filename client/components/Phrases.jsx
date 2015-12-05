@@ -112,10 +112,14 @@ Phrases = React.createClass({
 
   getMeteorData() {
     data = {};
-    this.subscription = Meteor.subscribe('phrases');
-    return {
-      phrases: PhrasesCollection.find({}, {sort: {createdAt: -1}}).fetch()
+
+    if (Meteor.subscribe('phrases').ready()) {
+      data.phrases = PhrasesCollection.find({}, {
+        sort: { createdAt: -1 }
+      }).fetch()
     }
+
+    return data;
   },
 
   addPhrase(phrase) {
@@ -129,7 +133,7 @@ Phrases = React.createClass({
   },
 
   render() {
-    if (!this.subscription.ready()) {
+    if (!this.data.phrases) {
       return <Loader/>;
     }
     return (

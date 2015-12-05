@@ -136,10 +136,13 @@ Categories = React.createClass({
 
   getMeteorData() {
     data = {};
-    this.subscription = Meteor.subscribe('categories');
-    data.categories = CategoriesCollection.find({},
-      { sort: { createdAt: -1 } }
-    ).fetch();
+
+    if (Meteor.subscribe('categories').ready()) {
+      data.categories = CategoriesCollection.find({}, {
+        sort: { createdAt: -1 }
+      }).fetch();
+    }
+
     return data;
   },
 
@@ -154,7 +157,7 @@ Categories = React.createClass({
   },
 
   render() {
-    if (!this.subscription.ready()) {
+    if (!this.data.categories) {
       return <Loader/>;
     }
     return (
