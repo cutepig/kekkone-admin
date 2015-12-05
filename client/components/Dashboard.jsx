@@ -1,7 +1,13 @@
 Dashboard = React.createClass({
   render() {
     return (
-      <h1>Welcome to kekkone</h1>
+      <div className="ui centered padded grid">
+        <div class="row">
+          <div className="column">
+            <h1>Welcome to Kekkone Admin</h1>
+          </div>
+        </div>
+      </div>
     );
   }
 });

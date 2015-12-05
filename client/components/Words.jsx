@@ -1,6 +1,6 @@
-Phrase = React.createClass({
+Word = React.createClass({
   propTypes: {
-    phrase: React.PropTypes.object.isRequired
+    word: React.PropTypes.object.isRequired
   },
 
   getInitialState() {
@@ -16,14 +16,14 @@ Phrase = React.createClass({
     }
   },
 
-  savePhrase() {
-    PhrasesCollection.update(this.props.phrase._id, {
+  saveWord() {
+    WordsCollection.update(this.props.word._id, {
       $set: { text: this.refs.textInput.value.trim() }
     });
   },
 
-  deletePhrase() {
-    PhrasesCollection.remove(this.props.phrase._id);
+  deleteWord() {
+    WordsCollection.remove(this.props.word._id);
   },
 
   handleClickEdit(event) {
@@ -32,12 +32,12 @@ Phrase = React.createClass({
   },
 
   handleClickDelete(event) {
-    this.deletePhrase();
+    this.deleteWord();
     event.preventDefault();
   },
 
   handleClickSave(event) {
-    this.savePhrase();
+    this.saveWord();
     this.setState({ edit: false });
     event.preventDefault();
   },
@@ -49,7 +49,7 @@ Phrase = React.createClass({
 
   handleInput(event) {
     if (event.keyCode == 13) {
-      this.savePhrase();
+      this.saveWord();
       this.setState({ edit: false });
     }
   },
@@ -58,16 +58,16 @@ Phrase = React.createClass({
     return (
       <tr>
         <td onDoubleClick={this.handleClickEdit}>
-          {this.props.phrase.text}
+          {this.props.word.text}
         </td>
         <td className="selectable collapsing">
           <a href="#" onClick={this.handleClickEdit}>
-            <i className="edit icon" /> Edit
+            <i className="edit icon"/> Edit
           </a>
         </td>
         <td className="selectable collapsing">
           <a href="#" onClick={this.handleClickDelete}>
-            <i className="trash icon" /> Delete
+            <i className="trash icon"/> Delete
           </a>
         </td>
       </tr>
@@ -82,18 +82,18 @@ Phrase = React.createClass({
             <input
               type="text"
               ref="textInput"
-              defaultValue={this.props.phrase.text}
-              onKeyUp={this.handleInput} />
+              defaultValue={this.props.word.text}
+              onKeyUp={this.handleInput}/>
           </div>
         </td>
         <td className="selectable collapsing">
           <a href="#" onClick={this.handleClickSave}>
-            <i className="save icon" /> Save
+            <i className="save icon"/> Save
           </a>
         </td>
         <td className="selectable collapsing">
           <a href="#" onClick={this.handleClickCancel}>
-            <i className="cancel icon" /> Cancel
+            <i className="cancel icon"/> Cancel
           </a>
         </td>
       </tr>
@@ -108,12 +108,16 @@ Phrase = React.createClass({
   }
 });
 
-Phrases = React.createClass({
+Words = React.createClass({
   mixins: [ReactMeteorData],
 
   getMeteorData() {
     return {
-      phrases: PhrasesCollection.find({}, {sort: {createdAt: -1}}).fetch()
+      category: CategoriesCollection.findOne(this.props.params.categoryId),
+      words: WordsCollection.find(
+          { categoryId: this.props.params.categoryId },
+          { sort: {createdAt: -1} }
+        ).fetch()
     }
   },
 
@@ -124,39 +128,42 @@ Phrases = React.createClass({
   handleInput(event) {
     if (event.keyCode == 13) {
       let textInput = ReactDOM.findDOMNode(this.refs.textInput);
-      PhrasesCollection.insert({
+      WordsCollection.insert({
         text: textInput.value.trim(),
+        categoryId: this.props.params.categoryId,
         createdAt: new Date()
       });
       textInput.value = '';
     }
   },
 
-  renderPhrases() {
-    return this.data.phrases.map((phrase) => {
-      return <Phrase key={phrase._id} phrase={phrase}/>;
+  renderWords() {
+    return this.data.words.map((word) => {
+      return <Word key={word._id} word={word}/>;
     });
   },
 
   render() {
+    let placeholder = `Type a new word for the category "${this.data.category.text}"`;
+
     return (
       <div>
         <div className="ui fluid input">
           <input
             type="text"
             ref="textInput"
-            placeholder="Type a new phrase"
+            placeholder={placeholder}
             onKeyUp={this.handleInput}/>
         </div>
         <table className="ui celled table">
           <thead>
             <tr>
-              <th>Phrase</th>
+              <th>Word</th>
               <th colSpan="2">Actions</th>
             </tr>
           </thead>
           <tbody>
-            {this.renderPhrases()}
+            {this.renderWords()}
           </tbody>
         </table>
       </div>

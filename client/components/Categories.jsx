@@ -1,10 +1,22 @@
+const { Link } = ReactRouter;
+
 Category = React.createClass({
+  mixins: [ReactMeteorData],
+
   propTypes: {
     category: React.PropTypes.object.isRequired
   },
 
+  getMeteorData() {
+    return {
+      count: WordsCollection.find({categoryId: this.props.category._id}).count()
+    }
+  },
+
   getInitialState() {
-    return { edit: false }
+    return {
+      edit: false,
+    }
   },
 
   componentDidUpdate() {
@@ -24,6 +36,7 @@ Category = React.createClass({
 
   deleteCategory() {
     CategoriesCollection.remove(this.props.category._id);
+    WordsCollection.remove({categoryId: this.props.category._id})
   },
 
   handleClickEdit(event) {
@@ -60,14 +73,19 @@ Category = React.createClass({
         <td onDoubleClick={this.handleClickEdit}>
           {this.props.category.text}
         </td>
+        <td className="selectable">
+          <Link to={`/vocabulary/${this.props.category._id}`}>
+            <i className="arrow circle outline right icon"></i> {this.data.count}
+          </Link>
+        </td>
         <td className="selectable collapsing">
           <a href="#" onClick={this.handleClickEdit}>
-            <i className="edit icon"/>
+            <i className="edit icon"/> Edit
           </a>
         </td>
         <td className="selectable collapsing">
           <a href="#" onClick={this.handleClickDelete}>
-            <i className="trash icon"/>
+            <i className="trash icon"/> Delete
           </a>
         </td>
       </tr>
@@ -86,14 +104,19 @@ Category = React.createClass({
               onKeyUp={this.handleInput}/>
           </div>
         </td>
+        <td className="selectable">
+          <Link to={`/vocabulary/${this.props.category._id}`}>
+            <i className="arrow circle outline right icon"></i> {this.data.count}
+          </Link>
+        </td>
         <td className="selectable collapsing">
           <a href="#" onClick={this.handleClickSave}>
-            <i className="save icon"/>
+            <i className="save icon"/> Save
           </a>
         </td>
         <td className="selectable collapsing">
           <a href="#" onClick={this.handleClickCancel}>
-            <i className="cancel icon"/>
+            <i className="cancel icon"/> Cancel
           </a>
         </td>
       </tr>
@@ -145,15 +168,15 @@ Categories = React.createClass({
           <input
             type="text"
             ref="textInput"
-            placeholder="Type a new category"
+            placeholder="Type a new word category"
             onKeyUp={this.handleInput}/>
         </div>
-        <table className="ui table">
+        <table className="ui celled table">
           <thead>
             <tr>
-              <th>Category</th>
-              <th></th>
-              <th></th>
+              <th className="fourteen wide">Category</th>
+              <th className="two wide">Word Count</th>
+              <th colSpan="2">Actions</th>
             </tr>
           </thead>
           <tbody>
