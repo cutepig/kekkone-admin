@@ -17,13 +17,12 @@ Phrase = React.createClass({
   },
 
   savePhrase() {
-    PhrasesCollection.update(this.props.phrase._id, {
-      $set: { text: this.refs.textInput.value.trim() }
-    });
+    text = this.refs.textInput.value.trim();
+    Meteor.call('updatePhrase', this.props.phrase._id, text);
   },
 
   deletePhrase() {
-    PhrasesCollection.remove(this.props.phrase._id);
+    Meteor.call('removePhrase', this.props.phrase._id);
   },
 
   handleClickEdit(event) {
@@ -124,10 +123,7 @@ Phrases = React.createClass({
   handleInput(event) {
     if (event.keyCode == 13) {
       let textInput = ReactDOM.findDOMNode(this.refs.textInput);
-      PhrasesCollection.insert({
-        text: textInput.value.trim(),
-        createdAt: new Date()
-      });
+      Meteor.call('addPhrase', textInput.value.trim())
       textInput.value = '';
     }
   },

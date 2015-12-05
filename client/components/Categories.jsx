@@ -29,14 +29,12 @@ Category = React.createClass({
   },
 
   saveCategory() {
-    CategoriesCollection.update(this.props.category._id, {
-      $set: { text: this.refs.textInput.value.trim() }
-    });
+    text = this.refs.textInput.value.trim();
+    Meteor.call('updateCategory', this.props.category._id, text);
   },
 
   deleteCategory() {
-    CategoriesCollection.remove(this.props.category._id);
-    WordsCollection.remove({categoryId: this.props.category._id})
+    Meteor.call('removeCategory', this.props.category._id);
   },
 
   handleClickEdit(event) {
@@ -147,10 +145,7 @@ Categories = React.createClass({
   handleInput(event) {
     if (event.keyCode == 13) {
       let textInput = ReactDOM.findDOMNode(this.refs.textInput);
-      CategoriesCollection.insert({
-        text: textInput.value.trim(),
-        createdAt: new Date()
-      });
+      Meteor.call('addCategory', textInput.value.trim());
       textInput.value = '';
     }
   },

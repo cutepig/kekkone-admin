@@ -17,13 +17,12 @@ Word = React.createClass({
   },
 
   saveWord() {
-    WordsCollection.update(this.props.word._id, {
-      $set: { text: this.refs.textInput.value.trim() }
-    });
+    text = this.refs.textInput.value.trim();
+    Meteor.call('updateWord', this.props.word._id, text);
   },
 
   deleteWord() {
-    WordsCollection.remove(this.props.word._id);
+    Meteor.call('removeWord', this.props.word._id);
   },
 
   handleClickEdit(event) {
@@ -128,11 +127,8 @@ Words = React.createClass({
   handleInput(event) {
     if (event.keyCode == 13) {
       let textInput = ReactDOM.findDOMNode(this.refs.textInput);
-      WordsCollection.insert({
-        text: textInput.value.trim(),
-        categoryId: this.props.params.categoryId,
-        createdAt: new Date()
-      });
+      let text = textInput.value.trim();
+      Meteor.call('addWord', this.props.params.categoryId, text);
       textInput.value = '';
     }
   },
