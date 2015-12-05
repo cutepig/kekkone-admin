@@ -1,6 +1,6 @@
-Phrase = React.createClass({
+Category = React.createClass({
   propTypes: {
-    phrase: React.PropTypes.object.isRequired
+    category: React.PropTypes.object.isRequired
   },
 
   getInitialState() {
@@ -16,14 +16,14 @@ Phrase = React.createClass({
     }
   },
 
-  savePhrase() {
-    PhrasesCollection.update(this.props.phrase._id, {
+  saveCategory() {
+    CategoriesCollection.update(this.props.category._id, {
       $set: { text: this.refs.textInput.value.trim() }
     });
   },
 
-  deletePhrase() {
-    PhrasesCollection.remove(this.props.phrase._id);
+  deleteCategory() {
+    CategoriesCollection.remove(this.props.category._id);
   },
 
   handleClickEdit(event) {
@@ -32,12 +32,12 @@ Phrase = React.createClass({
   },
 
   handleClickDelete(event) {
-    this.deletePhrase();
+    this.deleteCategory();
     event.preventDefault();
   },
 
   handleClickSave(event) {
-    this.savePhrase();
+    this.saveCategory();
     this.setState({ edit: false });
     event.preventDefault();
   },
@@ -49,7 +49,7 @@ Phrase = React.createClass({
 
   handleInput(event) {
     if (event.keyCode == 13) {
-      this.savePhrase();
+      this.saveCategory();
       this.setState({ edit: false });
     }
   },
@@ -58,16 +58,16 @@ Phrase = React.createClass({
     return (
       <tr>
         <td onDoubleClick={this.handleClickEdit}>
-          {this.props.phrase.text}
+          {this.props.category.text}
         </td>
         <td className="selectable collapsing">
           <a href="#" onClick={this.handleClickEdit}>
-            <i className="edit icon" />
+            <i className="edit icon"/>
           </a>
         </td>
         <td className="selectable collapsing">
           <a href="#" onClick={this.handleClickDelete}>
-            <i className="trash icon" />
+            <i className="trash icon"/>
           </a>
         </td>
       </tr>
@@ -82,18 +82,18 @@ Phrase = React.createClass({
             <input
               type="text"
               ref="textInput"
-              defaultValue={this.props.phrase.text}
-              onKeyUp={this.handleInput} />
+              defaultValue={this.props.category.text}
+              onKeyUp={this.handleInput}/>
           </div>
         </td>
         <td className="selectable collapsing">
           <a href="#" onClick={this.handleClickSave}>
-            <i className="save icon" />
+            <i className="save icon"/>
           </a>
         </td>
         <td className="selectable collapsing">
           <a href="#" onClick={this.handleClickCancel}>
-            <i className="cancel icon" />
+            <i className="cancel icon"/>
           </a>
         </td>
       </tr>
@@ -108,12 +108,12 @@ Phrase = React.createClass({
   }
 });
 
-Phrases = React.createClass({
+Categories = React.createClass({
   mixins: [ReactMeteorData],
 
   getMeteorData() {
     return {
-      phrases: PhrasesCollection.find({}, {sort: {createdAt: -1}}).fetch()
+      categories: CategoriesCollection.find({}, {sort: {createdAt: -1}}).fetch()
     }
   },
 
@@ -124,7 +124,7 @@ Phrases = React.createClass({
   handleInput(event) {
     if (event.keyCode == 13) {
       let textInput = ReactDOM.findDOMNode(this.refs.textInput);
-      PhrasesCollection.insert({
+      CategoriesCollection.insert({
         text: textInput.value.trim(),
         createdAt: new Date()
       });
@@ -132,9 +132,9 @@ Phrases = React.createClass({
     }
   },
 
-  renderPhrases() {
-    return this.data.phrases.map((phrase) => {
-      return <Phrase key={phrase._id} phrase={phrase}/>;
+  renderCategories() {
+    return this.data.categories.map((category) => {
+      return <Category key={category._id} category={category}/>;
     });
   },
 
@@ -145,19 +145,19 @@ Phrases = React.createClass({
           <input
             type="text"
             ref="textInput"
-            placeholder="Type a new phrase"
+            placeholder="Type a new category"
             onKeyUp={this.handleInput}/>
         </div>
         <table className="ui table">
           <thead>
             <tr>
-              <th>Phrase</th>
+              <th>Category</th>
               <th></th>
               <th></th>
             </tr>
           </thead>
           <tbody>
-            {this.renderPhrases()}
+            {this.renderCategories()}
           </tbody>
         </table>
       </div>

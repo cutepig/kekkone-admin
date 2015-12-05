@@ -8,6 +8,7 @@ Routes = React.createClass({
        <Router history={browserHistory}>
          <Route path="/" component={App}>
            <IndexRoute component={Dashboard}/>
+           <Route path="vocabulary" component={Categories}/>
            <Route path="phrases" component={Phrases}/>
          </Route>
        </Router>
