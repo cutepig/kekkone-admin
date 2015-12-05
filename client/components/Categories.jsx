@@ -135,22 +135,16 @@ Categories = React.createClass({
   mixins: [ReactMeteorData],
 
   getMeteorData() {
-    Meteor.subscribe('categories');
-    return {
-      categories: CategoriesCollection.find({}, {sort: {createdAt: -1}}).fetch()
-    }
+    data = {};
+    this.subscription = Meteor.subscribe('categories');
+    data.categories = CategoriesCollection.find({},
+      { sort: { createdAt: -1 } }
+    ).fetch();
+    return data;
   },
 
-  componentDidMount() {
-    this.refs.textInput.focus();
-  },
-
-  handleInput(event) {
-    if (event.keyCode == 13) {
-      let textInput = ReactDOM.findDOMNode(this.refs.textInput);
-      Meteor.call('addCategory', textInput.value.trim());
-      textInput.value = '';
-    }
+  addCategory(category) {
+    Meteor.call('addCategory', category);
   },
 
   renderCategories() {
@@ -160,14 +154,16 @@ Categories = React.createClass({
   },
 
   render() {
+    if (!this.subscription.ready()) {
+      return <Loader/>;
+    }
     return (
       <div>
         <div className="ui fluid input">
-          <input
-            type="text"
+          <TextInput
             ref="textInput"
             placeholder="Type a new word category"
-            onKeyUp={this.handleInput}/>
+            onEnter={this.addCategory}/>
         </div>
         <table className="ui celled table">
           <thead>

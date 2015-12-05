@@ -114,26 +114,17 @@ Words = React.createClass({
     data = {};
     categoryId = this.props.params.categoryId;
 
-    Meteor.subscribe('category', categoryId);
+    this.categorySubscription = Meteor.subscribe('category', categoryId);
     data.category = CategoriesCollection.findOne({ _id: categoryId });
 
-    Meteor.subscribe('words', categoryId);
+    this.wordsSubscription = Meteor.subscribe('words', categoryId);
     data.words = WordsCollection.find({}, { sort: {createdAt: -1} }).fetch();
 
     return data;
   },
 
-  componentDidMount() {
-    this.refs.textInput.focus();
-  },
-
-  handleInput(event) {
-    if (event.keyCode == 13) {
-      let textInput = ReactDOM.findDOMNode(this.refs.textInput);
-      let text = textInput.value.trim();
-      Meteor.call('addWord', this.props.params.categoryId, text);
-      textInput.value = '';
-    }
+  addWord(word) {
+    Meteor.call('addWord', this.props.params.categoryId, word);
   },
 
   renderWords() {
@@ -143,19 +134,17 @@ Words = React.createClass({
   },
 
   render() {
-    placeholder = 'Type a new word for the category';
-    if (this.data.category) {
-      placeholder += ` "${this.data.category.text}"`;
+    if (!this.categorySubscription.ready() ||
+        !this.wordsSubscription.ready()) {
+      return <Loader/>;
     }
-
     return (
       <div>
         <div className="ui fluid input">
-          <input
-            type="text"
+          <TextInput
             ref="textInput"
-            placeholder={placeholder}
-            onKeyUp={this.handleInput}/>
+            placeholder="Type a new word for the category"
+            onEnter={this.addWord}/>
         </div>
         <table className="ui celled table">
           <thead>

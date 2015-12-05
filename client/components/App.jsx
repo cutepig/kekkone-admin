@@ -1,7 +1,7 @@
 App = React.createClass({
   render() {
     return (
-      <div>
+      <div className="app">
         <Menu/>
         <div className="ui container">
           {this.props.children}

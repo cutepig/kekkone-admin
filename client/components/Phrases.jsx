@@ -111,22 +111,15 @@ Phrases = React.createClass({
   mixins: [ReactMeteorData],
 
   getMeteorData() {
-    Meteor.subscribe('phrases');
+    data = {};
+    this.subscription = Meteor.subscribe('phrases');
     return {
       phrases: PhrasesCollection.find({}, {sort: {createdAt: -1}}).fetch()
     }
   },
 
-  componentDidMount() {
-    this.refs.textInput.focus();
-  },
-
-  handleInput(event) {
-    if (event.keyCode == 13) {
-      let textInput = ReactDOM.findDOMNode(this.refs.textInput);
-      Meteor.call('addPhrase', textInput.value.trim())
-      textInput.value = '';
-    }
+  addPhrase(phrase) {
+    Meteor.call('addPhrase', phrase);
   },
 
   renderPhrases() {
@@ -136,14 +129,16 @@ Phrases = React.createClass({
   },
 
   render() {
+    if (!this.subscription.ready()) {
+      return <Loader/>;
+    }
     return (
       <div>
         <div className="ui fluid input">
-          <input
-            type="text"
+          <TextInput
             ref="textInput"
             placeholder="Type a new phrase"
-            onKeyUp={this.handleInput}/>
+            onEnter={this.addPhrase}/>
         </div>
         <table className="ui celled table">
           <thead>
