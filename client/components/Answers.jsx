@@ -1,6 +1,6 @@
-Word = React.createClass({
+Answer = React.createClass({
   propTypes: {
-    word: React.PropTypes.object.isRequired
+    answer: React.PropTypes.object.isRequired
   },
 
   getInitialState() {
@@ -13,13 +13,13 @@ Word = React.createClass({
     }
   },
 
-  updateWord(text) {
-    Meteor.call('updateWord', this.props.word._id, text);
+  updateAnswer(text) {
+    Meteor.call('updateAnswer', this.props.answer._id, text);
     this.setState({ edit: false });
   },
 
-  deleteWord() {
-    Meteor.call('removeWord', this.props.word._id);
+  deleteAnswer() {
+    Meteor.call('removeAnswer', this.props.answer._id);
   },
 
   handleClickEdit(event) {
@@ -29,12 +29,12 @@ Word = React.createClass({
 
   handleClickDelete(event) {
     event.preventDefault();
-    this.deleteWord();
+    this.deleteAnswer();
   },
 
   handleClickSave(event) {
     event.preventDefault();
-    this.updateWord(this.refs.textInput.getValue());
+    this.updateAnswer(this.refs.textInput.getValue());
   },
 
   handleClickCancel(event) {
@@ -46,7 +46,7 @@ Word = React.createClass({
     return (
       <tr>
         <td onDoubleClick={this.handleClickEdit}>
-          {this.props.word.text}
+          {this.props.answer.text}
         </td>
         <td className="selectable collapsing">
           <a href="#" onClick={this.handleClickEdit}>
@@ -69,8 +69,8 @@ Word = React.createClass({
           <div className="ui fluid input">
             <TextInput
               ref="textInput"
-              defaultValue={this.props.word.text}
-              onEnter={this.updateWord}/>
+              defaultValue={this.props.answer.text}
+              onEnter={this.updateAnswer}/>
           </div>
         </td>
         <td className="selectable collapsing">
@@ -95,75 +95,77 @@ Word = React.createClass({
   }
 });
 
-Words = React.createClass({
+Answers = React.createClass({
   mixins: [ReactMeteorData],
 
   getMeteorData() {
     data = {};
-    categoryId = this.props.params.categoryId;
+    keywordId = this.props.params.keywordId;
 
-    if (Meteor.subscribe('category', categoryId).ready()) {
-      data.category = CategoriesCollection.findOne({ _id: categoryId });
+    if (Meteor.subscribe('keyword', keywordId).ready()) {
+      data.keyword = KeywordsCollection.findOne({ _id: keywordId });
     }
-    if (Meteor.subscribe('words', categoryId).ready()) {
-      data.words = WordsCollection.find({}, { sort: {createdAt: -1} }).fetch();
+    if (Meteor.subscribe('answers', keywordId).ready()) {
+      data.answers = AnswersCollection.find({}, {
+        sort: { createdAt: -1 }
+      }).fetch();
     }
     return data;
   },
 
-  addWord(text) {
-    Meteor.call('addWord', this.props.params.categoryId, text);
+  addAnswer(text) {
+    Meteor.call('addAnswer', this.props.params.keywordId, text);
     this.refs.textInput.setValue('');
   },
 
   renderHeading() {
-    if (this.data.words.length == 0) {
+    if (this.data.answers.length == 0) {
       return (
         <tr>
-          <th colSpan="3">Word</th>
+          <th colSpan="3">Answer</th>
         </tr>
       );
     }
     return (
       <tr>
-        <th>Word</th>
+        <th>Answer</th>
         <th colSpan="2">Actions</th>
       </tr>
     );
   },
 
-  renderWords() {
-    if (this.data.words.length == 0) {
+  renderAnswers() {
+    if (this.data.answers.length == 0) {
       return (
         <tr className="disabled">
-          <td colSpan="3">No words added.</td>
+          <td colSpan="3">No answers added.</td>
         </tr>
       );
     }
-    return this.data.words.map((word) => {
-      return <Word key={word._id} word={word}/>;
+    return this.data.answers.map((answer) => {
+      return <Answer key={answer._id} answer={answer}/>;
     });
   },
 
   render() {
-    if (!this.data.category || !this.data.words) {
+    if (!this.data.keyword || !this.data.answers) {
       return <Loader/>;
     }
-    placeholder = `Type a new word for the category "${this.data.category.text}"`;
+    placeholder = `Type a new answer for the keyword "${this.data.keyword.text}"`
     return (
       <div>
         <div className="ui fluid input">
           <TextInput
             ref="textInput"
             placeholder={placeholder}
-            onEnter={this.addWord}/>
+            onEnter={this.addAnswer}/>
         </div>
         <table className="ui celled table">
           <thead>
             {this.renderHeading()}
           </thead>
           <tbody>
-            {this.renderWords()}
+            {this.renderAnswers()}
           </tbody>
         </table>
       </div>

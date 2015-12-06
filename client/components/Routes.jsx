@@ -8,10 +8,11 @@ Routes = React.createClass({
        <Router history={browserHistory}>
          <Route path="/" component={App}>
            <IndexRoute component={Dashboard}/>
+           <Route path="phrases" component={Phrases}/>
+           <Route path="keywords" component={Keywords}/>
+           <Route path="keywords/:keywordId" component={Answers}/>
            <Route path="vocabulary" component={Categories}/>
            <Route path="vocabulary/:categoryId" component={Words}/>
-           <Route path="phrases" component={Phrases}/>
-           <Route path="words" component={Categories}/>
          </Route>
        </Router>
      );

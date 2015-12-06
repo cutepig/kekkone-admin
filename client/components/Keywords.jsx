@@ -1,6 +1,18 @@
-Word = React.createClass({
+const { Link } = ReactRouter;
+
+Keyword = React.createClass({
+  mixins: [ReactMeteorData],
+
   propTypes: {
-    word: React.PropTypes.object.isRequired
+    keyword: React.PropTypes.object.isRequired
+  },
+
+  getMeteorData() {
+    keywordId = this.props.keyword._id;
+    Meteor.subscribe('answers', keywordId);
+    return {
+      count: AnswersCollection.find({keywordId: keywordId}).count()
+    }
   },
 
   getInitialState() {
@@ -13,13 +25,13 @@ Word = React.createClass({
     }
   },
 
-  updateWord(text) {
-    Meteor.call('updateWord', this.props.word._id, text);
+  updateKeyword(text) {
+    Meteor.call('updateKeyword', this.props.keyword._id, text);
     this.setState({ edit: false });
   },
 
-  deleteWord() {
-    Meteor.call('removeWord', this.props.word._id);
+  deleteKeyword() {
+    Meteor.call('removeKeyword', this.props.keyword._id);
   },
 
   handleClickEdit(event) {
@@ -29,12 +41,12 @@ Word = React.createClass({
 
   handleClickDelete(event) {
     event.preventDefault();
-    this.deleteWord();
+    this.deleteKeyword();
   },
 
   handleClickSave(event) {
     event.preventDefault();
-    this.updateWord(this.refs.textInput.getValue());
+    this.updateKeyword(this.refs.textInput.getValue());
   },
 
   handleClickCancel(event) {
@@ -46,7 +58,12 @@ Word = React.createClass({
     return (
       <tr>
         <td onDoubleClick={this.handleClickEdit}>
-          {this.props.word.text}
+          {this.props.keyword.text}
+        </td>
+        <td className="selectable">
+          <Link to={`/keywords/${this.props.keyword._id}`}>
+            <i className="arrow circle outline right icon"></i> {this.data.count}
+          </Link>
         </td>
         <td className="selectable collapsing">
           <a href="#" onClick={this.handleClickEdit}>
@@ -69,9 +86,14 @@ Word = React.createClass({
           <div className="ui fluid input">
             <TextInput
               ref="textInput"
-              defaultValue={this.props.word.text}
-              onEnter={this.updateWord}/>
+              defaultValue={this.props.keyword.text}
+              onEnter={this.updateKeyword}/>
           </div>
+        </td>
+        <td className="selectable">
+          <Link to={`/answers/${this.props.keyword._id}`}>
+            <i className="arrow circle outline right icon"></i> {this.data.count}
+          </Link>
         </td>
         <td className="selectable collapsing">
           <a href="#" onClick={this.handleClickSave}>
@@ -95,75 +117,74 @@ Word = React.createClass({
   }
 });
 
-Words = React.createClass({
+Keywords = React.createClass({
   mixins: [ReactMeteorData],
 
   getMeteorData() {
     data = {};
-    categoryId = this.props.params.categoryId;
 
-    if (Meteor.subscribe('category', categoryId).ready()) {
-      data.category = CategoriesCollection.findOne({ _id: categoryId });
+    if (Meteor.subscribe('keywords').ready()) {
+      data.keywords = KeywordsCollection.find({}, {
+        sort: { createdAt: -1 }
+      }).fetch();
     }
-    if (Meteor.subscribe('words', categoryId).ready()) {
-      data.words = WordsCollection.find({}, { sort: {createdAt: -1} }).fetch();
-    }
+
     return data;
   },
 
-  addWord(text) {
-    Meteor.call('addWord', this.props.params.categoryId, text);
+  addKeyword(keyword) {
+    Meteor.call('addKeyword', keyword);
     this.refs.textInput.setValue('');
   },
 
   renderHeading() {
-    if (this.data.words.length == 0) {
+    if (this.data.keywords.length == 0) {
       return (
         <tr>
-          <th colSpan="3">Word</th>
+          <th colSpan="4">Keyword</th>
         </tr>
       );
     }
     return (
       <tr>
-        <th>Word</th>
+        <th className="fourteen wide">Keyword</th>
+        <th className="two wide">Answers</th>
         <th colSpan="2">Actions</th>
       </tr>
     );
   },
 
-  renderWords() {
-    if (this.data.words.length == 0) {
+  renderKeywords() {
+    if (this.data.keywords.length == 0) {
       return (
         <tr className="disabled">
-          <td colSpan="3">No words added.</td>
+          <td colSpan="3">No keywords added.</td>
         </tr>
       );
     }
-    return this.data.words.map((word) => {
-      return <Word key={word._id} word={word}/>;
+    return this.data.keywords.map((keyword) => {
+      return <Keyword key={keyword._id} keyword={keyword}/>;
     });
   },
 
   render() {
-    if (!this.data.category || !this.data.words) {
+    if (!this.data.keywords) {
       return <Loader/>;
     }
-    placeholder = `Type a new word for the category "${this.data.category.text}"`;
     return (
       <div>
         <div className="ui fluid input">
           <TextInput
             ref="textInput"
-            placeholder={placeholder}
-            onEnter={this.addWord}/>
+            placeholder="Type a new keyword"
+            onEnter={this.addKeyword}/>
         </div>
         <table className="ui celled table">
           <thead>
             {this.renderHeading()}
           </thead>
           <tbody>
-            {this.renderWords()}
+            {this.renderKeywords()}
           </tbody>
         </table>
       </div>

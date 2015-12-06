@@ -16,23 +16,18 @@ Category = React.createClass({
   },
 
   getInitialState() {
-    return {
-      edit: false,
-    }
+    return { edit: false };
   },
 
   componentDidUpdate() {
     if (this.state.edit) {
-      value = this.refs.textInput.value;
-      this.refs.textInput.value = '';
       this.refs.textInput.focus();
-      this.refs.textInput.value = value;
     }
   },
 
-  saveCategory() {
-    text = this.refs.textInput.value.trim();
+  updateCategory(text) {
     Meteor.call('updateCategory', this.props.category._id, text);
+    this.setState({ edit: false });
   },
 
   deleteCategory() {
@@ -40,31 +35,23 @@ Category = React.createClass({
   },
 
   handleClickEdit(event) {
-    this.setState({ edit: true });
     event.preventDefault();
+    this.setState({ edit: true });
   },
 
   handleClickDelete(event) {
-    this.deleteCategory();
     event.preventDefault();
+    this.deleteCategory();
   },
 
   handleClickSave(event) {
-    this.saveCategory();
-    this.setState({ edit: false });
     event.preventDefault();
+    this.updateCategory(this.refs.textInput.getValue());
   },
 
   handleClickCancel(event) {
-    this.setState({ edit: false });
     event.preventDefault();
-  },
-
-  handleInput(event) {
-    if (event.keyCode == 13) {
-      this.saveCategory();
-      this.setState({ edit: false });
-    }
+    this.setState({ edit: false });
   },
 
   renderShow() {
@@ -97,11 +84,10 @@ Category = React.createClass({
       <tr>
         <td>
           <div className="ui fluid input">
-            <input
-              type="text"
+            <TextInput
               ref="textInput"
               defaultValue={this.props.category.text}
-              onKeyUp={this.handleInput}/>
+              onEnter={this.updateCategory}/>
           </div>
         </td>
         <td className="selectable">
@@ -148,9 +134,34 @@ Categories = React.createClass({
 
   addCategory(category) {
     Meteor.call('addCategory', category);
+    this.refs.textInput.setValue('');
+  },
+
+  renderHeading() {
+    if (this.data.categories.length == 0) {
+      return (
+        <tr>
+          <th colSpan="4">Category</th>
+        </tr>
+      );
+    }
+    return (
+      <tr>
+        <th className="fourteen wide">Category</th>
+        <th className="two wide">Words</th>
+        <th colSpan="2">Actions</th>
+      </tr>
+    );
   },
 
   renderCategories() {
+    if (this.data.categories.length == 0) {
+      return (
+        <tr className="disabled">
+          <td colSpan="3">No word categories added.</td>
+        </tr>
+      );
+    }
     return this.data.categories.map((category) => {
       return <Category key={category._id} category={category}/>;
     });
@@ -170,11 +181,7 @@ Categories = React.createClass({
         </div>
         <table className="ui celled table">
           <thead>
-            <tr>
-              <th className="fourteen wide">Category</th>
-              <th className="two wide">Word Count</th>
-              <th colSpan="2">Actions</th>
-            </tr>
+            {this.renderHeading()}
           </thead>
           <tbody>
             {this.renderCategories()}
