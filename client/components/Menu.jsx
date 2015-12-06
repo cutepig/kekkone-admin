@@ -20,7 +20,10 @@ Menu = React.createClass({
     return (
       <div className="ui fixed inverted menu">
         <div className="ui container">
-          <Link className="header item" to="/">Kekkone Admin</Link>
+          <Link className="header item">
+            <img className="ui mini image" src="kekkone.png"/>
+            <span className="m-l-10">Kekkone Admin</span>
+          </Link>
           <MenuLink to="/vocabulary">Vocabulary</MenuLink>
           <MenuLink to="/phrases">Phrases</MenuLink>
           <MenuLink to="/keywords">Keywords</MenuLink>
