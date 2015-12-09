@@ -53,7 +53,7 @@ Meteor.methods({
   },
 
   updateCategory(id, name) {
-    CategoriesCollection.update(id, { $set: { name: text }});
+    CategoriesCollection.update(id, { $set: { name: name }});
   },
 
   removeCategory(id) {
