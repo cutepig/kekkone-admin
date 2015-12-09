@@ -149,7 +149,7 @@ Words = React.createClass({
     if (!this.data.category || !this.data.words) {
       return <Loader/>;
     }
-    placeholder = `Type a new word for the category "${this.data.category.text}"`;
+    placeholder = `Type a new word for the category "${this.data.category.name}"`;
     return (
       <div>
         <div className="ui fluid input">

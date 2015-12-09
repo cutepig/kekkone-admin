@@ -25,8 +25,8 @@ Keyword = React.createClass({
     }
   },
 
-  updateKeyword(text) {
-    Meteor.call('updateKeyword', this.props.keyword._id, text);
+  updateKeyword(word) {
+    Meteor.call('updateKeyword', this.props.keyword._id, word);
     this.setState({ edit: false });
   },
 
@@ -58,7 +58,7 @@ Keyword = React.createClass({
     return (
       <tr>
         <td onDoubleClick={this.handleClickEdit}>
-          {this.props.keyword.text}
+          {this.props.keyword.word}
         </td>
         <td className="selectable">
           <Link to={`/keywords/${this.props.keyword._id}`}>
@@ -86,7 +86,7 @@ Keyword = React.createClass({
           <div className="ui fluid input">
             <TextInput
               ref="textInput"
-              defaultValue={this.props.keyword.text}
+              defaultValue={this.props.keyword.word}
               onEnter={this.updateKeyword}/>
           </div>
         </td>

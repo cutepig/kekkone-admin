@@ -14,15 +14,15 @@ Meteor.methods({
     PhrasesCollection.remove(id);
   },
 
-  addKeyword(text) {
+  addKeyword(word) {
     KeywordsCollection.insert({
-      text: text,
+      word: word,
       createdAt: new Date()
     });
   },
 
-  updateKeyword(id, text) {
-    KeywordsCollection.update(id, { $set: { text: text } });
+  updateKeyword(id, word) {
+    KeywordsCollection.update(id, { $set: { word: word } });
   },
 
   removeKeyword(id) {
@@ -45,15 +45,15 @@ Meteor.methods({
     AnswersCollection.remove(id);
   },
 
-  addCategory(text) {
+  addCategory(name) {
     CategoriesCollection.insert({
-      text: text,
+      name: name,
       createdAt: new Date()
     });
   },
 
-  updateCategory(id, text) {
-    CategoriesCollection.update(id, { $set: { text: text }});
+  updateCategory(id, name) {
+    CategoriesCollection.update(id, { $set: { name: text }});
   },
 
   removeCategory(id) {

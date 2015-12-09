@@ -25,8 +25,8 @@ Category = React.createClass({
     }
   },
 
-  updateCategory(text) {
-    Meteor.call('updateCategory', this.props.category._id, text);
+  updateCategory(name) {
+    Meteor.call('updateCategory', this.props.category._id, name);
     this.setState({ edit: false });
   },
 
@@ -58,7 +58,7 @@ Category = React.createClass({
     return (
       <tr>
         <td onDoubleClick={this.handleClickEdit}>
-          {this.props.category.text}
+          {this.props.category.name}
         </td>
         <td className="selectable">
           <Link to={`/vocabulary/${this.props.category._id}`}>
@@ -86,7 +86,7 @@ Category = React.createClass({
           <div className="ui fluid input">
             <TextInput
               ref="textInput"
-              defaultValue={this.props.category.text}
+              defaultValue={this.props.category.name}
               onEnter={this.updateCategory}/>
           </div>
         </td>

@@ -151,7 +151,7 @@ Answers = React.createClass({
     if (!this.data.keyword || !this.data.answers) {
       return <Loader/>;
     }
-    placeholder = `Type a new answer for the keyword "${this.data.keyword.text}"`
+    placeholder = `Type a new answer for the keyword "${this.data.keyword.word}"`
     return (
       <div>
         <div className="ui fluid input">
