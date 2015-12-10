@@ -1,5 +1,11 @@
 const { Link } = ReactRouter;
 
+/**
+ * ------------------------------------------------------------------------
+ * Keyword row component
+ * ------------------------------------------------------------------------
+ */
+
 Keyword = React.createClass({
   mixins: [ReactMeteorData],
 
@@ -8,10 +14,12 @@ Keyword = React.createClass({
   },
 
   getMeteorData() {
-    keywordId = this.props.keyword._id;
-    Meteor.subscribe('answers', keywordId);
+    let keywordId = this.props.keyword._id;
+    let handle = Meteor.subscribe('answers', keywordId);
+
     return {
-      count: AnswersCollection.find({keywordId: keywordId}).count()
+      countLoading: !handle.ready(),
+      count: AnswersCollection.find({ keywordId: keywordId }).count()
     }
   },
 
@@ -54,6 +62,19 @@ Keyword = React.createClass({
     this.setState({ edit: false });
   },
 
+  renderCount() {
+    if (this.data.countLoading) {
+      return (
+        <div className="ui active mini inline loader"></div>
+      );
+    }
+    return (
+      <div>
+        <i className="arrow circle outline right icon"></i> {this.data.count}
+      </div>
+    );
+  },
+
   renderShow() {
     return (
       <tr>
@@ -62,7 +83,7 @@ Keyword = React.createClass({
         </td>
         <td className="selectable">
           <Link to={`/keywords/${this.props.keyword._id}`}>
-            <i className="arrow circle outline right icon"></i> {this.data.count}
+            {this.renderCount()}
           </Link>
         </td>
         <td className="selectable collapsing">
@@ -92,7 +113,7 @@ Keyword = React.createClass({
         </td>
         <td className="selectable">
           <Link to={`/answers/${this.props.keyword._id}`}>
-            <i className="arrow circle outline right icon"></i> {this.data.count}
+            {this.renderCount()}
           </Link>
         </td>
         <td className="selectable collapsing">
@@ -117,19 +138,22 @@ Keyword = React.createClass({
   }
 });
 
+/**
+ * ------------------------------------------------------------------------
+ * Keywords table component
+ * ------------------------------------------------------------------------
+ */
+
 Keywords = React.createClass({
   mixins: [ReactMeteorData],
 
   getMeteorData() {
-    data = {};
+    let handle = Meteor.subscribe('keywords');
 
-    if (Meteor.subscribe('keywords').ready()) {
-      data.keywords = KeywordsCollection.find({}, {
-        sort: { createdAt: -1 }
-      }).fetch();
+    return {
+      loading: !handle.ready(),
+      keywords: KeywordsCollection.find({}, { sort: { createdAt: -1 } }).fetch()
     }
-
-    return data;
   },
 
   addKeyword(keyword) {
@@ -168,7 +192,7 @@ Keywords = React.createClass({
   },
 
   render() {
-    if (!this.data.keywords) {
+    if (this.data.loading) {
       return <Loader/>;
     }
     return (

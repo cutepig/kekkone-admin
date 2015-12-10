@@ -1,3 +1,9 @@
+/**
+ * ------------------------------------------------------------------------
+ * Word row component
+ * ------------------------------------------------------------------------
+ */
+
 Word = React.createClass({
   propTypes: {
     word: React.PropTypes.object.isRequired
@@ -95,20 +101,26 @@ Word = React.createClass({
   }
 });
 
+/**
+ * ------------------------------------------------------------------------
+ * Words table component
+ * ------------------------------------------------------------------------
+ */
+
 Words = React.createClass({
   mixins: [ReactMeteorData],
 
   getMeteorData() {
-    data = {};
-    categoryId = this.props.params.categoryId;
+    let categoryId = this.props.params.categoryId;
 
-    if (Meteor.subscribe('category', categoryId).ready()) {
-      data.category = CategoriesCollection.findOne({ _id: categoryId });
+    let categoryHandle = Meteor.subscribe('category', categoryId);
+    let wordsHandle = Meteor.subscribe('words', categoryId);
+
+    return {
+      loading: !(categoryHandle.ready() && wordsHandle.ready()),
+      category: CategoriesCollection.findOne({ _id: categoryId }),
+      words: WordsCollection.find({ categoryId: categoryId }, { sort: { createdAt: -1 } }).fetch()
     }
-    if (Meteor.subscribe('words', categoryId).ready()) {
-      data.words = WordsCollection.find({}, { sort: {createdAt: -1} }).fetch();
-    }
-    return data;
   },
 
   addWord(text) {
@@ -146,7 +158,7 @@ Words = React.createClass({
   },
 
   render() {
-    if (!this.data.category || !this.data.words) {
+    if (this.data.loading) {
       return <Loader/>;
     }
     placeholder = `Type a new word for the category "${this.data.category.name}"`;

@@ -1,3 +1,9 @@
+/**
+ * ------------------------------------------------------------------------
+ * Answer row component
+ * ------------------------------------------------------------------------
+ */
+
 Answer = React.createClass({
   propTypes: {
     answer: React.PropTypes.object.isRequired
@@ -95,22 +101,26 @@ Answer = React.createClass({
   }
 });
 
+/**
+ * ------------------------------------------------------------------------
+ * Answers table component
+ * ------------------------------------------------------------------------
+ */
+
 Answers = React.createClass({
   mixins: [ReactMeteorData],
 
   getMeteorData() {
-    data = {};
-    keywordId = this.props.params.keywordId;
+    let keywordId = this.props.params.keywordId;
 
-    if (Meteor.subscribe('keyword', keywordId).ready()) {
-      data.keyword = KeywordsCollection.findOne({ _id: keywordId });
+    let keywordHandle = Meteor.subscribe('keyword', keywordId);
+    let answersHandle = Meteor.subscribe('answers', keywordId);
+
+    return {
+      loading: !(keywordHandle.ready() && answersHandle.ready()),
+      keyword: KeywordsCollection.findOne({ _id: keywordId }),
+      answers: AnswersCollection.find({ keywordId: keywordId }, { sort: { createdAt: -1 } }).fetch()
     }
-    if (Meteor.subscribe('answers', keywordId).ready()) {
-      data.answers = AnswersCollection.find({}, {
-        sort: { createdAt: -1 }
-      }).fetch();
-    }
-    return data;
   },
 
   addAnswer(text) {
@@ -148,10 +158,10 @@ Answers = React.createClass({
   },
 
   render() {
-    if (!this.data.keyword || !this.data.answers) {
+    if (this.data.loading) {
       return <Loader/>;
     }
-    placeholder = `Type a new answer for the keyword "${this.data.keyword.word}"`
+    placeholder = `Type a new answer for the keyword "${this.data.keyword.word}"`;
     return (
       <div>
         <div className="ui fluid input">

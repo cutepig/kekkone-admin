@@ -1,5 +1,11 @@
 const { Link } = ReactRouter;
 
+/**
+ * ------------------------------------------------------------------------
+ * Category row component
+ * ------------------------------------------------------------------------
+ */
+
 Category = React.createClass({
   mixins: [ReactMeteorData],
 
@@ -8,9 +14,11 @@ Category = React.createClass({
   },
 
   getMeteorData() {
-    categoryId = this.props.category._id;
-    Meteor.subscribe('words', categoryId);
+    let categoryId = this.props.category._id;
+    let handle = Meteor.subscribe('words', categoryId);
+
     return {
+      countLoading: !handle.ready(),
       count: WordsCollection.find({categoryId: categoryId}).count()
     }
   },
@@ -54,6 +62,19 @@ Category = React.createClass({
     this.setState({ edit: false });
   },
 
+  renderCount() {
+    if (this.data.countLoading) {
+      return (
+        <div className="ui active mini inline loader"></div>
+      );
+    }
+    return (
+      <div>
+        <i className="arrow circle outline right icon"></i> {this.data.count}
+      </div>
+    );
+  },
+
   renderShow() {
     return (
       <tr>
@@ -62,7 +83,7 @@ Category = React.createClass({
         </td>
         <td className="selectable">
           <Link to={`/vocabulary/${this.props.category._id}`}>
-            <i className="arrow circle outline right icon"></i> {this.data.count}
+            {this.renderCount()}
           </Link>
         </td>
         <td className="selectable collapsing">
@@ -92,7 +113,7 @@ Category = React.createClass({
         </td>
         <td className="selectable">
           <Link to={`/vocabulary/${this.props.category._id}`}>
-            <i className="arrow circle outline right icon"></i> {this.data.count}
+            {this.renderCount()}
           </Link>
         </td>
         <td className="selectable collapsing">
@@ -116,6 +137,12 @@ Category = React.createClass({
     return this.renderShow();
   }
 });
+
+/**
+ * ------------------------------------------------------------------------
+ * Categories table component
+ * ------------------------------------------------------------------------
+ */
 
 Categories = React.createClass({
   mixins: [ReactMeteorData],

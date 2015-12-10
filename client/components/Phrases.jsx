@@ -1,3 +1,9 @@
+/**
+ * ------------------------------------------------------------------------
+ * Phrase row component
+ * ------------------------------------------------------------------------
+ */
+
 Phrase = React.createClass({
   propTypes: {
     phrase: React.PropTypes.object.isRequired
@@ -95,17 +101,22 @@ Phrase = React.createClass({
   }
 });
 
+/**
+ * ------------------------------------------------------------------------
+ * Phrases table component
+ * ------------------------------------------------------------------------
+ */
+
 Phrases = React.createClass({
   mixins: [ReactMeteorData],
 
   getMeteorData() {
-    data = {};
-    if (Meteor.subscribe('phrases').ready()) {
-      data.phrases = PhrasesCollection.find({}, {
-        sort: { createdAt: -1 }
-      }).fetch()
+    let handle = Meteor.subscribe('phrases');
+
+    return {
+      loading: !handle.ready(),
+      phrases: PhrasesCollection.find({}, { sort: { createdAt: -1 }}).fetch()
     }
-    return data;
   },
 
   addPhrase(phrase) {
@@ -143,7 +154,7 @@ Phrases = React.createClass({
   },
 
   render() {
-    if (!this.data.phrases) {
+    if (this.data.loading) {
       return <Loader/>;
     }
     return (
