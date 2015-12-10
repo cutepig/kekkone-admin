@@ -25,7 +25,7 @@ Menu = React.createClass({
             <span className="m-l-10">Kekkone Admin</span>
           </Link>
           <MenuLink to="/phrases">Phrases</MenuLink>
-          <MenuLink to="/keywords">Keywords</MenuLink>
+          <MenuLink to="/keywords">Questions & Answers</MenuLink>
           <MenuLink to="/vocabulary">Vocabulary</MenuLink>
         </div>
       </div>
