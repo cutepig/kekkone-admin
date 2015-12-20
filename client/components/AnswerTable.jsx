@@ -4,7 +4,7 @@
  * ------------------------------------------------------------------------
  */
 
-Answer = React.createClass({
+AnswerRow = React.createClass({
   propTypes: {
     answer: React.PropTypes.object.isRequired
   },
@@ -52,7 +52,7 @@ Answer = React.createClass({
     return (
       <tr>
         <td onDoubleClick={this.handleClickEdit}>
-          {this.props.answer.text}
+          <LabeledText text={this.props.answer.text}/>
         </td>
         <td className="selectable collapsing">
           <a href="#" onClick={this.handleClickEdit}>
@@ -103,22 +103,23 @@ Answer = React.createClass({
 
 /**
  * ------------------------------------------------------------------------
- * Answers table component
+ * Answer table component
  * ------------------------------------------------------------------------
  */
 
-Answers = React.createClass({
+AnswerTable = React.createClass({
   mixins: [ReactMeteorData],
 
-  getMeteorData() {
-    let keywordId = this.props.params.keywordId;
+  propTypes: {
+    keyword: React.PropTypes.object.isRequired
+  },
 
-    let keywordHandle = Meteor.subscribe('keyword', keywordId);
+  getMeteorData() {
+    let keywordId = this.props.keyword._id;
     let answersHandle = Meteor.subscribe('answers', keywordId);
 
     return {
-      loading: !(keywordHandle.ready() && answersHandle.ready()),
-      keyword: KeywordsCollection.findOne({ _id: keywordId }),
+      loading: !answersHandle.ready(),
       answers: AnswersCollection.find({ keywordId: keywordId }, { sort: { createdAt: -1 } }).fetch()
     }
   },
@@ -128,7 +129,7 @@ Answers = React.createClass({
     this.refs.textInput.setValue('');
   },
 
-  renderHeading() {
+  renderHead() {
     if (this.data.answers.length == 0) {
       return (
         <tr>
@@ -144,7 +145,7 @@ Answers = React.createClass({
     );
   },
 
-  renderAnswers() {
+  renderRows() {
     if (this.data.answers.length == 0) {
       return (
         <tr className="disabled">
@@ -153,7 +154,7 @@ Answers = React.createClass({
       );
     }
     return this.data.answers.map((answer) => {
-      return <Answer key={answer._id} answer={answer}/>;
+      return <AnswerRow key={answer._id} answer={answer}/>;
     });
   },
 
@@ -161,24 +162,16 @@ Answers = React.createClass({
     if (this.data.loading) {
       return <Loader/>;
     }
-    placeholder = `Type a new answer for the keyword "${this.data.keyword.word}"`;
+    placeholder = `Type a new answer for the keyword "${this.props.keyword.word}"`;
     return (
-      <div>
-        <div className="ui fluid input">
-          <TextInput
-            ref="textInput"
-            placeholder={placeholder}
-            onEnter={this.addAnswer}/>
-        </div>
-        <table className="ui celled table">
-          <thead>
-            {this.renderHeading()}
-          </thead>
-          <tbody>
-            {this.renderAnswers()}
-          </tbody>
-        </table>
-      </div>
+      <table className="ui celled table">
+        <thead>
+          {this.renderHead()}
+        </thead>
+        <tbody>
+          {this.renderRows()}
+        </tbody>
+      </table>
     );
   }
 });

@@ -52,7 +52,7 @@ Phrase = React.createClass({
     return (
       <tr>
         <td onDoubleClick={this.handleClickEdit}>
-          {this.props.phrase.text}
+          <LabeledText text={this.props.phrase.text}/>
         </td>
         <td className="selectable collapsing">
           <a href="#" onClick={this.handleClickEdit}>

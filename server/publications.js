@@ -18,8 +18,8 @@ Meteor.publish('categories', () => {
   return CategoriesCollection.find();
 });
 
-Meteor.publish('category', (id) => {
-  return CategoriesCollection.find({ _id: id });
+Meteor.publish('category', (name) => {
+  return CategoriesCollection.find({ name: name });
 });
 
 Meteor.publish('words', (categoryId) => {

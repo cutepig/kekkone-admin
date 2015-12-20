@@ -4,7 +4,7 @@
  * ------------------------------------------------------------------------
  */
 
-Word = React.createClass({
+WordRow = React.createClass({
   propTypes: {
     word: React.PropTypes.object.isRequired
   },
@@ -103,32 +103,29 @@ Word = React.createClass({
 
 /**
  * ------------------------------------------------------------------------
- * Words table component
+ * Word table component
  * ------------------------------------------------------------------------
  */
 
-Words = React.createClass({
+WordTable = React.createClass({
   mixins: [ReactMeteorData],
 
-  getMeteorData() {
-    let categoryId = this.props.params.categoryId;
+  propTypes: {
+    category: React.PropTypes.object.isRequired
+  },
 
-    let categoryHandle = Meteor.subscribe('category', categoryId);
+  getMeteorData() {
+    let categoryId = this.props.category._id;
     let wordsHandle = Meteor.subscribe('words', categoryId);
 
     return {
-      loading: !(categoryHandle.ready() && wordsHandle.ready()),
-      category: CategoriesCollection.findOne({ _id: categoryId }),
-      words: WordsCollection.find({ categoryId: categoryId }, { sort: { createdAt: -1 } }).fetch()
-    }
+      loading: !wordsHandle.ready(),
+      words: WordsCollection.find(
+        { categoryId: categoryId }, { sort: { createdAt: -1 } }).fetch()
+    };
   },
 
-  addWord(text) {
-    Meteor.call('addWord', this.props.params.categoryId, text);
-    this.refs.textInput.setValue('');
-  },
-
-  renderHeading() {
+  renderHead() {
     if (this.data.words.length == 0) {
       return (
         <tr>
@@ -144,7 +141,7 @@ Words = React.createClass({
     );
   },
 
-  renderWords() {
+  renderRows() {
     if (this.data.words.length == 0) {
       return (
         <tr className="disabled">
@@ -153,7 +150,7 @@ Words = React.createClass({
       );
     }
     return this.data.words.map((word) => {
-      return <Word key={word._id} word={word}/>;
+      return <WordRow key={word._id} word={word}/>;
     });
   },
 
@@ -161,24 +158,15 @@ Words = React.createClass({
     if (this.data.loading) {
       return <Loader/>;
     }
-    placeholder = `Type a new word for the category "${this.data.category.name}"`;
     return (
-      <div>
-        <div className="ui fluid input">
-          <TextInput
-            ref="textInput"
-            placeholder={placeholder}
-            onEnter={this.addWord}/>
-        </div>
-        <table className="ui celled table">
-          <thead>
-            {this.renderHeading()}
-          </thead>
-          <tbody>
-            {this.renderWords()}
-          </tbody>
-        </table>
-      </div>
+      <table className="ui celled table">
+        <thead>
+          {this.renderHead()}
+        </thead>
+        <tbody>
+          {this.renderRows()}
+        </tbody>
+      </table>
     );
   }
 });

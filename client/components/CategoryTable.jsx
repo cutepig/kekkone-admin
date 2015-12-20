@@ -6,7 +6,7 @@ const { Link } = ReactRouter;
  * ------------------------------------------------------------------------
  */
 
-Category = React.createClass({
+CategoryRow = React.createClass({
   mixins: [ReactMeteorData],
 
   propTypes: {
@@ -82,7 +82,7 @@ Category = React.createClass({
           {this.props.category.name}
         </td>
         <td className="selectable">
-          <Link to={`/vocabulary/${this.props.category._id}`}>
+          <Link to={`/vocabulary/${this.props.category.name}`}>
             {this.renderCount()}
           </Link>
         </td>
@@ -112,7 +112,7 @@ Category = React.createClass({
           </div>
         </td>
         <td className="selectable">
-          <Link to={`/vocabulary/${this.props.category._id}`}>
+          <Link to={`/vocabulary/${this.props.category.name}`}>
             {this.renderCount()}
           </Link>
         </td>
@@ -140,23 +140,13 @@ Category = React.createClass({
 
 /**
  * ------------------------------------------------------------------------
- * Categories table component
+ * Category table component
  * ------------------------------------------------------------------------
  */
 
-Categories = React.createClass({
-  mixins: [ReactMeteorData],
-
-  getMeteorData() {
-    data = {};
-
-    if (Meteor.subscribe('categories').ready()) {
-      data.categories = CategoriesCollection.find({}, {
-        sort: { createdAt: -1 }
-      }).fetch();
-    }
-
-    return data;
+CategoryTable = React.createClass({
+  propTypes: {
+    categories: React.PropTypes.array.isRequired
   },
 
   addCategory(category) {
@@ -164,8 +154,8 @@ Categories = React.createClass({
     this.refs.textInput.setValue('');
   },
 
-  renderHeading() {
-    if (this.data.categories.length == 0) {
+  renderHead() {
+    if (this.props.categories.length == 0) {
       return (
         <tr>
           <th colSpan="4">Category</th>
@@ -181,40 +171,29 @@ Categories = React.createClass({
     );
   },
 
-  renderCategories() {
-    if (this.data.categories.length == 0) {
+  renderRows() {
+    if (this.props.categories.length == 0) {
       return (
         <tr className="disabled">
           <td colSpan="3">No word categories added.</td>
         </tr>
       );
     }
-    return this.data.categories.map((category) => {
-      return <Category key={category._id} category={category}/>;
+    return this.props.categories.map((category) => {
+      return <CategoryRow key={category._id} category={category}/>;
     });
   },
 
   render() {
-    if (!this.data.categories) {
-      return <Loader/>;
-    }
     return (
-      <div>
-        <div className="ui fluid input">
-          <TextInput
-            ref="textInput"
-            placeholder="Type a new word category"
-            onEnter={this.addCategory}/>
-        </div>
-        <table className="ui celled table">
-          <thead>
-            {this.renderHeading()}
-          </thead>
-          <tbody>
-            {this.renderCategories()}
-          </tbody>
-        </table>
-      </div>
+      <table className="ui celled table">
+        <thead>
+          {this.renderHead()}
+        </thead>
+        <tbody>
+          {this.renderRows()}
+        </tbody>
+      </table>
     );
   }
 });

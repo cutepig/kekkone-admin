@@ -10,9 +10,9 @@ Routes = React.createClass({
            <IndexRoute component={Dashboard}/>
            <Route path="phrases" component={Phrases}/>
            <Route path="keywords" component={Keywords}/>
-           <Route path="keywords/:keywordId" component={Answers}/>
-           <Route path="vocabulary" component={Categories}/>
-           <Route path="vocabulary/:categoryId" component={Words}/>
+           <Route path="keywords/:keywordId" component={AnswerTableContainer}/>
+           <Route path="vocabulary" component={CategoryTableContainer}/>
+           <Route path="vocabulary/:categoryName" component={WordTableContainer}/>
          </Route>
        </Router>
      );
